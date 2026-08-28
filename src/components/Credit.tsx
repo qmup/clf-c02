@@ -1,4 +1,5 @@
 const GITHUB_URL = 'https://github.com/qmup'
+const NAME = 'Quân Mụp'
 
 export function Credit() {
   return (
@@ -8,9 +9,24 @@ export function Credit() {
         href={GITHUB_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="credit-name inline-block font-semibold"
+        className="credit-name font-semibold"
+        aria-label="Quân Mụp on GitHub"
       >
-        Quân Mụp
+        {Array.from(NAME).map((char, index) =>
+          char === ' ' ? (
+            <span key={index} className="credit-letter-space">
+              {' '}
+            </span>
+          ) : (
+            <span
+              key={index}
+              className="credit-letter"
+              style={{ animationDelay: `${index * 0.12}s` }}
+            >
+              {char}
+            </span>
+          ),
+        )}
       </a>{' '}
       to practice for the AWS Certified Cloud Practitioner exam.
     </p>
