@@ -105,6 +105,10 @@ export function Result({ onHome }: { onHome: () => void }) {
             )
           })}
         </section>
+
+        <p className="mt-8 pb-4 text-center text-xs leading-relaxed text-neutral-500">
+          Made by Quân Mụp to practice for the AWS Certified Cloud Practitioner exam.
+        </p>
       </div>
     </div>
   )

@@ -71,6 +71,10 @@ export function Home({ onEnter }: { onEnter: () => void }) {
             Start exam
           </button>
         </div>
+
+        <p className="mt-10 text-center text-xs leading-relaxed text-neutral-500">
+          Made by Quân Mụp to practice for the AWS Certified Cloud Practitioner exam.
+        </p>
       </div>
     </div>
   )
