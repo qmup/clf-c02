@@ -1,4 +1,5 @@
 import { Brand } from '../components/Brand'
+import { Credit } from '../components/Credit'
 import { QuestionCard } from '../components/Question'
 import { isCorrect, normalizeAnswer } from '../lib/score'
 import { useExamStore } from '../store'
@@ -106,9 +107,9 @@ export function Result({ onHome }: { onHome: () => void }) {
           })}
         </section>
 
-        <p className="mt-8 pb-4 text-center text-xs leading-relaxed text-neutral-500">
-          Made by Quân Mụp to practice for the AWS Certified Cloud Practitioner exam.
-        </p>
+        <div className="mt-8 pb-4">
+          <Credit />
+        </div>
       </div>
     </div>
   )

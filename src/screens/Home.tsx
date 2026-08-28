@@ -1,5 +1,6 @@
 import { QUESTION_BANK } from '../lib/bank'
 import { Brand } from '../components/Brand'
+import { Credit } from '../components/Credit'
 import { useExamStore } from '../store'
 
 export function Home({ onEnter }: { onEnter: () => void }) {
@@ -72,8 +73,8 @@ export function Home({ onEnter }: { onEnter: () => void }) {
           </button>
         </div>
 
-        <p className="mt-10 text-center text-xs leading-relaxed text-neutral-500">
-          Made by Quân Mụp to practice for the AWS Certified Cloud Practitioner exam.
+        <p className="mt-10">
+          <Credit />
         </p>
       </div>
     </div>
