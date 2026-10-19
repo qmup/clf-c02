@@ -22,6 +22,13 @@ export function isCorrect(question: Question, selected: OptionKey[] | undefined)
   return got.length === expected.length && got.every((key, i) => key === expected[i])
 }
 
+export function correctQuestionIds(
+  questions: Question[],
+  answers: Record<string, OptionKey[]>,
+): string[] {
+  return questions.filter((question) => isCorrect(question, answers[question.id])).map((q) => q.id)
+}
+
 export function scoreExam(
   questions: Question[],
   unscoredIds: string[],

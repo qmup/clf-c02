@@ -1,13 +1,37 @@
+import { useMemo, useState } from 'react'
 import { Brand } from '../components/Brand'
 import { Credit } from '../components/Credit'
 import { QuestionCard } from '../components/Question'
 import { isCorrect, normalizeAnswer } from '../lib/score'
 import { useExamStore } from '../store'
+import type { ResultFilter } from '../types'
+
+const FILTERS: { id: ResultFilter; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'incorrect', label: 'Incorrect' },
+]
 
 export function Result({ onHome }: { onHome: () => void }) {
   const session = useExamStore((s) => s.session)
+  const canSkipCorrect = useExamStore((s) => s.lastCorrectIds.length > 0)
+  const [filter, setFilter] = useState<ResultFilter>('all')
   const result = session?.result
+  const reviewed = useMemo(() => {
+    if (!session) return []
+    return session.questions.map((question, index) => {
+      const selected = session.answers[question.id] ?? []
+      return {
+        question,
+        index,
+        selected,
+        ok: isCorrect(question, selected),
+      }
+    })
+  }, [session])
+
   if (!session || !result) return null
+
+  const visible = filter === 'incorrect' ? reviewed.filter((item) => !item.ok) : reviewed
 
   return (
     <div className="min-h-dvh bg-neutral-100 pb-10">
@@ -64,47 +88,81 @@ export function Result({ onHome }: { onHome: () => void }) {
           </ul>
         </section>
 
-        <button
-          type="button"
-          onClick={() => {
-            useExamStore.getState().reset()
-            onHome()
-          }}
-          className="mt-4 min-h-12 w-full rounded-xl bg-orange-500 text-base font-semibold text-neutral-900"
-        >
-          New exam
-        </button>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => {
+              useExamStore.getState().reset()
+              onHome()
+            }}
+            className="min-h-12 flex-1 rounded-xl bg-orange-500 text-base font-semibold text-neutral-900"
+          >
+            New exam
+          </button>
+          {canSkipCorrect && (
+            <button
+              type="button"
+              onClick={() => useExamStore.getState().startExam('skip-correct')}
+              className="min-h-12 flex-1 rounded-xl border border-neutral-300 bg-white text-base font-semibold text-neutral-900"
+            >
+              Next exam
+            </button>
+          )}
+        </div>
 
-        <section className="mt-6 space-y-4">
-          {session.questions.map((question, index) => {
-            const selected = session.answers[question.id] ?? []
-            const ok = isCorrect(question, selected)
-            const expected = normalizeAnswer(question.answer).join(', ')
-            return (
-              <article
-                key={question.id}
-                className="rounded-2xl border border-neutral-200 bg-white p-5"
-              >
-                <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold">
-                  <span>Question {index + 1}</span>
-                  <span className={ok ? 'text-emerald-600' : 'text-red-600'}>
-                    {ok ? 'Correct' : 'Incorrect'}
-                  </span>
-                </div>
-                <QuestionCard
-                  question={question}
-                  selected={selected}
-                  onChange={() => undefined}
-                  disabled
-                  reveal
-                />
-                <p className="mt-3 text-xs text-neutral-500">Correct response: {expected}</p>
-                <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
-                  {question.explanation}
-                </p>
-              </article>
-            )
-          })}
+        <div className="sticky top-0 z-10 mt-6 flex gap-2 bg-neutral-100 py-3">
+          {FILTERS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={filter === item.id}
+              onClick={() => setFilter(item.id)}
+              className={[
+                'min-h-11 flex-1 rounded-full border text-sm font-medium',
+                filter === item.id
+                  ? 'border-neutral-900 bg-neutral-900 text-white'
+                  : 'border-neutral-200 bg-white text-neutral-800',
+              ].join(' ')}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <section className="space-y-4">
+          {visible.length === 0 ? (
+            <p className="rounded-2xl border border-neutral-200 bg-white p-5 text-sm text-neutral-600">
+              No incorrect questions.
+            </p>
+          ) : (
+            visible.map(({ question, index, selected, ok }) => {
+              const expected = normalizeAnswer(question.answer).join(', ')
+              return (
+                <article
+                  key={question.id}
+                  className="rounded-2xl border border-neutral-200 bg-white p-5"
+                >
+                  <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold">
+                    <span>Question {index + 1}</span>
+                    <span className={ok ? 'text-emerald-600' : 'text-red-600'}>
+                      {ok ? 'Correct' : 'Incorrect'}
+                    </span>
+                  </div>
+                  <QuestionCard
+                    question={question}
+                    selected={selected}
+                    onChange={() => undefined}
+                    disabled
+                    reveal
+                  />
+                  <p className="mt-3 text-xs text-neutral-500">Correct response: {expected}</p>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+                    {question.explanation}
+                  </p>
+                </article>
+              )
+            })
+          )}
         </section>
 
         <div className="mt-8 pb-4">

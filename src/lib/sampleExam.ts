@@ -12,7 +12,10 @@ function shuffle<T>(items: T[]): T[] {
   return next
 }
 
-export function sampleExam(bank: Question[]): {
+export function sampleExam(
+  bank: Question[],
+  excludeIds?: ReadonlySet<string>,
+): {
   questions: Question[]
   unscoredIds: string[]
 } {
@@ -20,7 +23,16 @@ export function sampleExam(bank: Question[]): {
   const unscored: Question[] = []
 
   for (const domain of [1, 2, 3, 4] as const) {
-    const pool = shuffle(bank.filter((q) => q.domain === domain))
+    const domainPool = bank.filter((q) => q.domain === domain)
+    const fresh = shuffle(
+      excludeIds ? domainPool.filter((q) => !excludeIds.has(q.id)) : domainPool,
+    )
+    const repeated = excludeIds
+      ? shuffle(domainPool.filter((q) => excludeIds.has(q.id)))
+      : []
+    // Prefer questions that were not answered correctly last time. Previously
+    // correct items are only used if a domain pool would otherwise run short.
+    const pool = [...fresh, ...repeated]
     const scoredN = SCORED_QUOTA[domain]
     const unscoredN = UNSCORED_QUOTA[domain]
     scored.push(...pool.slice(0, scoredN))

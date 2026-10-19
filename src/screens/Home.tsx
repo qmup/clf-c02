@@ -23,6 +23,7 @@ const DOMAINS: { id: DomainId; name: string; weight: number }[] = [
 export function Home({ onEnter }: { onEnter: () => void }) {
   const session = useExamStore((s) => s.session)
   const startExam = useExamStore((s) => s.startExam)
+  const canSkipCorrect = useExamStore((s) => s.lastCorrectIds.length > 0)
   const canContinue = session !== null && session.view !== 'result'
   const bankSize = QUESTION_BANK.length
 
@@ -59,6 +60,18 @@ export function Home({ onEnter }: { onEnter: () => void }) {
                 Start practice exam
                 <ArrowRight className="h-4 w-4" />
               </button>
+              {canSkipCorrect && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    startExam('skip-correct')
+                    onEnter()
+                  }}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-sm font-semibold text-neutral-900"
+                >
+                  Next exam
+                </button>
+              )}
               <button
                 type="button"
                 disabled={!canContinue}
@@ -68,6 +81,13 @@ export function Home({ onEnter }: { onEnter: () => void }) {
                 Continue exam
               </button>
             </div>
+
+            {canSkipCorrect && (
+              <p className="mt-4 max-w-xl text-sm text-neutral-500">
+                Next exam leaves out questions you answered correctly last time. Missed questions
+                can still appear.
+              </p>
+            )}
 
             <p className="mt-5 flex items-start gap-2 text-sm text-neutral-500">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-neutral-700" strokeWidth={2.5} />

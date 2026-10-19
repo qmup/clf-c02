@@ -2,6 +2,8 @@ export type OptionKey = 'A' | 'B' | 'C' | 'D' | 'E'
 export type DomainId = 1 | 2 | 3 | 4
 export type View = 'home' | 'exam' | 'review' | 'result'
 export type ReviewFilter = 'all' | 'incomplete' | 'flagged'
+export type ExamMode = 'standard' | 'skip-correct'
+export type ResultFilter = 'all' | 'incorrect'
 
 export interface Question {
   id: string
