@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Brand } from '../components/Brand'
 import { Credit } from '../components/Credit'
-import { ProgressSync } from '../components/ProgressSync'
 import { QuestionCard } from '../components/Question'
 import { isCorrect, normalizeAnswer } from '../lib/score'
 import { useExamStore } from '../store'
@@ -89,14 +88,14 @@ export function Result({ onHome }: { onHome: () => void }) {
           </ul>
         </section>
 
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => {
               useExamStore.getState().reset()
               onHome()
             }}
-            className="min-h-12 flex-1 rounded-xl bg-orange-500 text-base font-semibold text-neutral-900"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-neutral-900"
           >
             New exam
           </button>
@@ -104,14 +103,12 @@ export function Result({ onHome }: { onHome: () => void }) {
             <button
               type="button"
               onClick={() => useExamStore.getState().startExam('skip-correct')}
-              className="min-h-12 flex-1 rounded-xl border border-neutral-300 bg-white text-base font-semibold text-neutral-900"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900"
             >
               Next exam
             </button>
           )}
         </div>
-
-        <ProgressSync className="mt-4" />
 
         <div className="sticky top-0 z-10 mt-6 flex gap-2 bg-neutral-100 py-3">
           {FILTERS.map((item) => (
