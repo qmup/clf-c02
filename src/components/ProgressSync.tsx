@@ -43,44 +43,45 @@ export function ProgressSync({ className = '' }: { className?: string }) {
   }
 
   return (
-    <section className={['rounded-2xl border border-neutral-200 bg-white p-5', className].filter(Boolean).join(' ')}>
-      <h2 className="text-sm font-semibold text-neutral-900">Sync progress</h2>
-      <p className="mt-1 text-sm leading-relaxed text-neutral-500">
-        Copy this code and paste it on another device. Next exam skips questions answered correctly
-        on either device. Missed questions can still appear.
+    <section className={['rounded-2xl border border-neutral-200 bg-white p-4', className].filter(Boolean).join(' ')}>
+      <p className="text-sm leading-relaxed text-neutral-500">
+        Paste a code from another device, or copy one to take with you. Next exam skips questions
+        answered correctly on either device.
       </p>
-      <label htmlFor={fieldId} className="mt-4 block text-xs font-medium text-neutral-600">
+      <label htmlFor={fieldId} className="mt-3 block text-xs font-medium text-neutral-600">
         Progress code
       </label>
       <textarea
         id={fieldId}
         value={code}
-        rows={4}
+        rows={3}
         spellCheck={false}
         onChange={(event) => setCode(event.target.value)}
         placeholder="clf1:..."
         className="mt-1 w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 font-mono text-xs text-neutral-800"
       />
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+      <div className="mt-3 flex gap-2">
         <button
           type="button"
           disabled={correctIds.length === 0}
           onClick={() => void copyCode()}
-          className="min-h-11 flex-1 rounded-full border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-10 flex-1 rounded-full border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Copy code
         </button>
         <button
           type="button"
           onClick={mergeCode}
-          className="min-h-11 flex-1 rounded-full bg-neutral-900 px-4 text-sm font-semibold text-white"
+          className="min-h-10 flex-1 rounded-full bg-neutral-900 px-4 text-sm font-semibold text-white"
         >
           Merge code
         </button>
       </div>
-      <p role="status" className={['mt-2 min-h-5 text-sm', error ? 'text-red-600' : 'text-neutral-600'].join(' ')}>
-        {status}
-      </p>
+      {status && (
+        <p role="status" className={['mt-2 text-sm', error ? 'text-red-600' : 'text-neutral-600'].join(' ')}>
+          {status}
+        </p>
+      )}
     </section>
   )
 }

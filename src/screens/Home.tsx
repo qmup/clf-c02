@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ArrowRight, Check } from 'lucide-react'
 import { Brand } from '../components/Brand'
 import { Credit } from '../components/Credit'
@@ -26,6 +27,7 @@ export function Home({ onEnter }: { onEnter: () => void }) {
   const startExam = useExamStore((s) => s.startExam)
   const canSkipCorrect = useExamStore((s) => s.correctIds.length > 0)
   const canContinue = session !== null && session.view !== 'result'
+  const [syncOpen, setSyncOpen] = useState(false)
   const bankSize = QUESTION_BANK.length
 
   return (
@@ -49,14 +51,14 @@ export function Home({ onEnter }: { onEnter: () => void }) {
               randomized exams and unlimited free attempts.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-8 flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => {
                   startExam()
                   onEnter()
                 }}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-orange-500 px-6 text-sm font-semibold text-neutral-900"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-orange-500 px-5 text-sm font-semibold text-neutral-900"
               >
                 Start practice exam
                 <ArrowRight className="h-4 w-4" />
@@ -68,29 +70,31 @@ export function Home({ onEnter }: { onEnter: () => void }) {
                     startExam('skip-correct')
                     onEnter()
                   }}
-                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-sm font-semibold text-neutral-900"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900"
                 >
                   Next exam
                 </button>
               )}
-              <button
-                type="button"
-                disabled={!canContinue}
-                onClick={onEnter}
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-neutral-300 bg-white px-6 text-sm font-semibold text-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Continue exam
-              </button>
+              {canContinue && (
+                <button
+                  type="button"
+                  onClick={onEnter}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900"
+                >
+                  Continue
+                </button>
+              )}
             </div>
 
-            {canSkipCorrect && (
-              <p className="mt-4 max-w-xl text-sm text-neutral-500">
-                Next exam leaves out questions you have answered correctly. Missed questions can
-                still appear.
-              </p>
-            )}
-
-            <ProgressSync className="mt-8 max-w-xl" />
+            <button
+              type="button"
+              aria-expanded={syncOpen}
+              onClick={() => setSyncOpen((open) => !open)}
+              className="mt-4 text-sm font-medium text-neutral-500 underline underline-offset-2"
+            >
+              Sync progress
+            </button>
+            {syncOpen && <ProgressSync className="mt-3 max-w-xl" />}
 
             <p className="mt-5 flex items-start gap-2 text-sm text-neutral-500">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-neutral-700" strokeWidth={2.5} />
