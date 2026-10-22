@@ -32,6 +32,21 @@ export function Exam() {
     return () => window.clearInterval(id)
   }, [session])
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
+      const target = e.target as HTMLElement | null
+      if (target?.closest('input, textarea, select, [contenteditable="true"]')) return
+      const { session: current, setIndex } = useExamStore.getState()
+      if (!current) return
+      e.preventDefault()
+      setIndex(current.currentIndex + (e.key === 'ArrowRight' ? 1 : -1))
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
   const answered = useMemo(
     () => session?.questions.map((q) => isAnswered(q, session.answers[q.id])) ?? [],
     [session],
