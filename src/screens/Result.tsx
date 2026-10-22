@@ -13,7 +13,6 @@ const FILTERS: { id: ResultFilter; label: string }[] = [
 
 export function Result({ onHome }: { onHome: () => void }) {
   const session = useExamStore((s) => s.session)
-  const canSkipCorrect = useExamStore((s) => s.correctIds.length > 0)
   const [filter, setFilter] = useState<ResultFilter>('all')
   const result = session?.result
   const reviewed = useMemo(() => {
@@ -36,7 +35,19 @@ export function Result({ onHome }: { onHome: () => void }) {
   return (
     <div className="min-h-dvh bg-neutral-100 pb-10">
       <header className="border-b border-neutral-200 bg-white px-4 py-3 lg:px-8">
-        <Brand />
+        <div className="flex items-center justify-between gap-3">
+          <Brand />
+          <button
+            type="button"
+            onClick={() => {
+              useExamStore.getState().reset()
+              onHome()
+            }}
+            className="inline-flex min-h-10 items-center justify-center rounded-full border border-neutral-300 px-4 text-sm font-semibold text-neutral-900"
+          >
+            Back to menu
+          </button>
+        </div>
       </header>
 
       <div className="mx-auto max-w-3xl px-4 py-6">
@@ -87,28 +98,6 @@ export function Result({ onHome }: { onHome: () => void }) {
             })}
           </ul>
         </section>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              useExamStore.getState().reset()
-              onHome()
-            }}
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-neutral-900"
-          >
-            New exam
-          </button>
-          {canSkipCorrect && (
-            <button
-              type="button"
-              onClick={() => useExamStore.getState().startExam('skip-correct')}
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900"
-            >
-              Next exam
-            </button>
-          )}
-        </div>
 
         <div className="sticky top-0 z-10 mt-6 flex gap-2 bg-neutral-100 py-3">
           {FILTERS.map((item) => (
