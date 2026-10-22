@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Brand } from '../components/Brand'
 import { Credit } from '../components/Credit'
+import { ProgressSync } from '../components/ProgressSync'
 import { QuestionCard } from '../components/Question'
 import { isCorrect, normalizeAnswer } from '../lib/score'
 import { useExamStore } from '../store'
@@ -13,7 +14,7 @@ const FILTERS: { id: ResultFilter; label: string }[] = [
 
 export function Result({ onHome }: { onHome: () => void }) {
   const session = useExamStore((s) => s.session)
-  const canSkipCorrect = useExamStore((s) => s.lastCorrectIds.length > 0)
+  const canSkipCorrect = useExamStore((s) => s.correctIds.length > 0)
   const [filter, setFilter] = useState<ResultFilter>('all')
   const result = session?.result
   const reviewed = useMemo(() => {
@@ -109,6 +110,8 @@ export function Result({ onHome }: { onHome: () => void }) {
             </button>
           )}
         </div>
+
+        <ProgressSync className="mt-4" />
 
         <div className="sticky top-0 z-10 mt-6 flex gap-2 bg-neutral-100 py-3">
           {FILTERS.map((item) => (

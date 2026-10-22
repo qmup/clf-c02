@@ -1,6 +1,7 @@
 import { ArrowRight, Check } from 'lucide-react'
 import { Brand } from '../components/Brand'
 import { Credit } from '../components/Credit'
+import { ProgressSync } from '../components/ProgressSync'
 import { QUESTION_BANK } from '../lib/bank'
 import { useExamStore } from '../store'
 import type { DomainId } from '../types'
@@ -23,7 +24,7 @@ const DOMAINS: { id: DomainId; name: string; weight: number }[] = [
 export function Home({ onEnter }: { onEnter: () => void }) {
   const session = useExamStore((s) => s.session)
   const startExam = useExamStore((s) => s.startExam)
-  const canSkipCorrect = useExamStore((s) => s.lastCorrectIds.length > 0)
+  const canSkipCorrect = useExamStore((s) => s.correctIds.length > 0)
   const canContinue = session !== null && session.view !== 'result'
   const bankSize = QUESTION_BANK.length
 
@@ -84,10 +85,12 @@ export function Home({ onEnter }: { onEnter: () => void }) {
 
             {canSkipCorrect && (
               <p className="mt-4 max-w-xl text-sm text-neutral-500">
-                Next exam leaves out questions you answered correctly last time. Missed questions
-                can still appear.
+                Next exam leaves out questions you have answered correctly. Missed questions can
+                still appear.
               </p>
             )}
+
+            <ProgressSync className="mt-8 max-w-xl" />
 
             <p className="mt-5 flex items-start gap-2 text-sm text-neutral-500">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-neutral-700" strokeWidth={2.5} />
