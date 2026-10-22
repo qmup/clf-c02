@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { QUESTION_BANK } from './lib/bank'
+import { mergeCorrectIds as unionCorrectIds } from './lib/progress'
 import { sampleExam } from './lib/sampleExam'
 import { correctQuestionIds, scoreExam } from './lib/score'
 import type { ExamMode, ExamSession, OptionKey, ReviewFilter } from './types'
@@ -8,8 +9,9 @@ import { EXAM_SECONDS } from './types'
 
 interface ExamStore {
   session: ExamSession | null
-  lastCorrectIds: string[]
+  correctIds: string[]
   startExam: (mode?: ExamMode) => void
+  mergeCorrectIds: (ids: string[]) => void
   setAnswer: (id: string, keys: OptionKey[]) => void
   toggleFlag: (id: string) => void
   setIndex: (index: number) => void
@@ -41,14 +43,15 @@ export const useExamStore = create<ExamStore>()(
   persist(
     (set, get) => ({
       session: null,
-      lastCorrectIds: [],
+      correctIds: [],
       startExam: (mode = 'standard') => {
         const excludeIds =
-          mode === 'skip-correct' && get().lastCorrectIds.length > 0
-            ? new Set(get().lastCorrectIds)
+          mode === 'skip-correct' && get().correctIds.length > 0
+            ? new Set(get().correctIds)
             : undefined
         set({ session: newSession(excludeIds) })
       },
+      mergeCorrectIds: (ids) => set({ correctIds: unionCorrectIds(get().correctIds, ids) }),
       setAnswer: (id, keys) => {
         const session = get().session
         if (!session || session.view === 'result') return
@@ -105,7 +108,10 @@ export const useExamStore = create<ExamStore>()(
         const session = get().session
         if (!session || session.view === 'result') return
         set({
-          lastCorrectIds: correctQuestionIds(session.questions, session.answers),
+          correctIds: unionCorrectIds(
+            get().correctIds,
+            correctQuestionIds(session.questions, session.answers),
+          ),
           session: {
             ...session,
             view: 'result',
@@ -115,6 +121,23 @@ export const useExamStore = create<ExamStore>()(
       },
       reset: () => set({ session: null }),
     }),
-    { name: 'clf-c02-exam' },
+    {
+      name: 'clf-c02-exam',
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as {
+          session?: ExamSession | null
+          lastCorrectIds?: string[]
+          correctIds?: string[]
+        }
+        if (version < 1) {
+          return {
+            session: state.session ?? null,
+            correctIds: state.correctIds ?? state.lastCorrectIds ?? [],
+          }
+        }
+        return state
+      },
+    },
   ),
 )
