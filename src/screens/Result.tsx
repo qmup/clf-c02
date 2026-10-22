@@ -137,6 +137,7 @@ export function Result({ onHome }: { onHome: () => void }) {
           ) : (
             visible.map(({ question, index, selected, ok }) => {
               const expected = normalizeAnswer(question.answer).join(', ')
+              const yours = [...selected].sort().join(', ')
               return (
                 <article
                   key={question.id}
@@ -155,7 +156,10 @@ export function Result({ onHome }: { onHome: () => void }) {
                     disabled
                     reveal
                   />
-                  <p className="mt-3 text-xs text-neutral-500">Correct response: {expected}</p>
+                  <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500">
+                    <span>Your response: {yours || '—'}</span>
+                    <span>Correct response: {expected}</span>
+                  </p>
                   <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
                     {question.explanation}
                   </p>
